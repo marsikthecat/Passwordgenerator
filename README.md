@@ -1,2 +1,2 @@
 # Passwordgenerator
-Small amateur app for creating a random password
+Small and Simple Application for creating random passwords, using Java and JavaFX for the GUI
