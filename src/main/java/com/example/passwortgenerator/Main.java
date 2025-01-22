@@ -15,9 +15,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/***
- * <p> </p>
+/**
  * Passwordgenerator.
+ * Main: 113 lines.
+ * Password: 43 lines.
+ * Viewmodel: 93 lines.
+ * 249 lines.
  */
 
 public class Main extends Application {
@@ -28,6 +31,7 @@ public class Main extends Application {
 
   @Override
   public void start(Stage stage) {
+    ViewModel viewModel = new ViewModel();
     Slider lengthSlider = new Slider(0, 30, 15);
     lengthSlider.setShowTickLabels(true);
     lengthSlider.setShowTickMarks(true);
@@ -35,42 +39,53 @@ public class Main extends Application {
     lengthSlider.setMinorTickCount(5);
     lengthSlider.setBlockIncrement(1);
 
-    Label selectedAgeLabel = new Label("Länge des Passworts: " + (int) lengthSlider.getValue());
+    Label selectedAgeLabel = new Label(viewModel.selectedLengthProperty().get()
+            + (int) lengthSlider.getValue());
+    selectedAgeLabel.textProperty().bind(viewModel.selectedLengthProperty());
     lengthSlider.valueProperty().addListener((observable, oldValue, newValue)
-            -> selectedAgeLabel.setText("Gewählte Länge: " + newValue.intValue()));
+            -> selectedAgeLabel.setText(viewModel.chosenLengthProperty().get()
+            + newValue.intValue()));
 
-    CheckBox numbers = new CheckBox("Mit Zahlen");
-    CheckBox symbols = new CheckBox("Mit Sonderzeichen");
+    CheckBox numbers = new CheckBox();
+    numbers.textProperty().bind(viewModel.withNumbersProperty());
+    CheckBox symbols = new CheckBox();
+    symbols.textProperty().bind(viewModel.withSymbolsProperty());
 
-    Button btn = new Button("Passwort erzeugen");
+    Button btn = new Button();
+    btn.textProperty().bind(viewModel.generatePasswordProperty());
     TextField field = new TextField();
     btn.setOnAction(e -> generatePasswort(field, (int) lengthSlider.getValue(),
             numbers.isSelected(), symbols.isSelected()));
 
-    Button copybtn = new Button("Passwort kopieren");
+    Button copybtn = new Button();
+    copybtn.textProperty().bind(viewModel.copyPasswordProperty());
     style(btn, copybtn);
-    Label l = new Label("Passwort kopiert");
+    Label l = new Label();
+    l.textProperty().bind(viewModel.copiedProperty());
     l.setVisible(false);
     copybtn.setOnAction(e -> copypasswort(field, l));
 
-    HBox btnbox = new HBox(5);
     btn.setOnMouseClicked(e -> {
       if (l.isVisible()) {
         l.setVisible(false);
       }
     });
+    Label lang = new Label();
+    lang.textProperty().bind(viewModel.langProperty());
+    lang.setOnMouseClicked(e -> viewModel.switchLanguage());
 
+    HBox btnbox = new HBox(5);
     btnbox.setPadding(new Insets(5, 0, 0, 0));
     btnbox.setAlignment(Pos.CENTER);
     btnbox.getChildren().addAll(btn, copybtn);
     VBox content = new VBox(5);
     content.getChildren().addAll(lengthSlider, selectedAgeLabel,
-            numbers, symbols, field, btnbox, l);
+            numbers, symbols, field, btnbox, new HBox(l, lang));
     content.setPadding(new Insets(10));
 
     Scene scene = new Scene(content, 320, 215);
     stage.setResizable(false);
-    stage.setTitle("Passwortgenerator");
+    stage.setTitle("Passwordgenerator");
     stage.setScene(scene);
     stage.show();
   }

@@ -18,7 +18,7 @@ public class Password {
     this.content = generatepassword(length, withnumbers, withsymbols);
   }
 
-  String generatepassword(int length, boolean withnumbers, boolean withsymbols) {
+  private String generatepassword(int length, boolean withnumbers, boolean withsymbols) {
     String letters = "abcdefghijklmnopqrstuvwxyz";
     String numbers = "1234567890";
     String symbols = "!§$%&/()=?+*~'#-_:.;;µ<>|€@^{[]}°";
@@ -37,7 +37,7 @@ public class Password {
     return password.toString();
   }
 
-  String getPassword() {
+  public String getPassword() {
     return content;
   }
 }
