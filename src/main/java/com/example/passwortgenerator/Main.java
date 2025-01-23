@@ -12,18 +12,22 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- * Passwordgenerator.
- * Main: 113 lines.
+ * Passwordgenerator that supports german and english.
+ * Main: 129 lines.
  * Password: 43 lines.
- * Viewmodel: 93 lines.
- * 249 lines.
+ * LanguageManager: 58 lines.
+ * 230 lines.
  */
 
 public class Main extends Application {
+
+  private final LanguageManager languageManager = LanguageManager.getInstance();
 
   public static void main(String[] args) {
     launch();
@@ -31,7 +35,6 @@ public class Main extends Application {
 
   @Override
   public void start(Stage stage) {
-    ViewModel viewModel = new ViewModel();
     Slider lengthSlider = new Slider(0, 30, 15);
     lengthSlider.setShowTickLabels(true);
     lengthSlider.setShowTickMarks(true);
@@ -39,30 +42,33 @@ public class Main extends Application {
     lengthSlider.setMinorTickCount(5);
     lengthSlider.setBlockIncrement(1);
 
-    Label selectedAgeLabel = new Label(viewModel.selectedLengthProperty().get()
-            + (int) lengthSlider.getValue());
-    selectedAgeLabel.textProperty().bind(viewModel.selectedLengthProperty());
-    lengthSlider.valueProperty().addListener((observable, oldValue, newValue)
-            -> selectedAgeLabel.setText(viewModel.chosenLengthProperty().get()
-            + newValue.intValue()));
+    Label lengthLabel = new Label();
+    lengthLabel.setId("lengthlabel");
 
-    CheckBox numbers = new CheckBox();
-    numbers.textProperty().bind(viewModel.withNumbersProperty());
-    CheckBox symbols = new CheckBox();
-    symbols.textProperty().bind(viewModel.withSymbolsProperty());
+    Label choosenLength = new Label();
+    lengthSlider.valueProperty().addListener((observable, oldValue, newValue)
+            -> choosenLength.setText(": " + newValue.intValue()));
+
+    CheckBox num = new CheckBox();
+    num.setId("withNumbers");
+    CheckBox symbol = new CheckBox();
+    symbol.setId("withSymbols");
 
     Button btn = new Button();
-    btn.textProperty().bind(viewModel.generatePasswordProperty());
+    btn.setId("generatePassword");
+
     TextField field = new TextField();
     btn.setOnAction(e -> generatePasswort(field, (int) lengthSlider.getValue(),
-            numbers.isSelected(), symbols.isSelected()));
+            num.isSelected(), symbol.isSelected()));
 
     Button copybtn = new Button();
-    copybtn.textProperty().bind(viewModel.copyPasswordProperty());
+    copybtn.setId("copyPassword");
     style(btn, copybtn);
+
     Label l = new Label();
-    l.textProperty().bind(viewModel.copiedProperty());
+    l.setId("copied");
     l.setVisible(false);
+
     copybtn.setOnAction(e -> copypasswort(field, l));
 
     btn.setOnMouseClicked(e -> {
@@ -70,18 +76,24 @@ public class Main extends Application {
         l.setVisible(false);
       }
     });
+    Region spacer = new Region();
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+
     Label lang = new Label();
-    lang.textProperty().bind(viewModel.langProperty());
-    lang.setOnMouseClicked(e -> viewModel.switchLanguage());
+    lang.setId("langswitch");
+    lang.setOnMouseClicked(e -> languageManager.switchLanguage());
 
     HBox btnbox = new HBox(5);
     btnbox.setPadding(new Insets(5, 0, 0, 0));
     btnbox.setAlignment(Pos.CENTER);
     btnbox.getChildren().addAll(btn, copybtn);
+
     VBox content = new VBox(5);
-    content.getChildren().addAll(lengthSlider, selectedAgeLabel,
-            numbers, symbols, field, btnbox, new HBox(l, lang));
+    content.getChildren().addAll(lengthSlider, new HBox(lengthLabel, choosenLength),
+            num, symbol, field, btnbox, new HBox(l, spacer, lang));
     content.setPadding(new Insets(10));
+
+    languageManager.registerUiElements(lengthLabel, num, symbol, btn, copybtn, l, lang);
 
     Scene scene = new Scene(content, 320, 215);
     stage.setResizable(false);
