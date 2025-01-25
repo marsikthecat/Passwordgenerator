@@ -52,8 +52,7 @@ public class LanguageManager {
   }
 
   public void switchLanguage() {
-    index = index == 0 ? 1 : 0;
-    this.bundle = ResourceBundle.getBundle("bundles", locale[index]);
+    this.bundle = ResourceBundle.getBundle("bundles", locale[index = 1 - index]);
     applyLanguage();
   }
 }

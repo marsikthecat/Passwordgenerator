@@ -19,10 +19,10 @@ import javafx.stage.Stage;
 
 /**
  * Passwordgenerator that supports german and english.
- * Main: 129 lines.
+ * Main: 130 lines.
  * Password: 43 lines.
  * LanguageManager: 58 lines.
- * 230 lines.
+ * 231 lines.
  */
 
 public class Main extends Application {
@@ -49,6 +49,9 @@ public class Main extends Application {
     lengthSlider.valueProperty().addListener((observable, oldValue, newValue)
             -> choosenLength.setText(": " + newValue.intValue()));
 
+    Region spacer = new Region();
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+
     CheckBox num = new CheckBox();
     num.setId("withNumbers");
     CheckBox symbol = new CheckBox();
@@ -59,7 +62,7 @@ public class Main extends Application {
 
     TextField field = new TextField();
     btn.setOnAction(e -> generatePasswort(field, (int) lengthSlider.getValue(),
-            num.isSelected(), symbol.isSelected()));
+              num.isSelected(), symbol.isSelected()));
 
     Button copybtn = new Button();
     copybtn.setId("copyPassword");
@@ -76,8 +79,6 @@ public class Main extends Application {
         l.setVisible(false);
       }
     });
-    Region spacer = new Region();
-    HBox.setHgrow(spacer, Priority.ALWAYS);
 
     Label lang = new Label();
     lang.setId("langswitch");
